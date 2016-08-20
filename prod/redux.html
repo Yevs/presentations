@@ -1,0 +1,347 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Redux 101</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/white.css" id="theme">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>Redux 101</h1>
+					<div>
+						<div><small>Yevsyuhov Yevhen</small></div>
+						<div>
+							<small>github: <a href="https://github.com/Yevs">@Yevs</a></small>
+						</div>
+						<div>
+							<small>email: <a href="mailto:yevhen.yevsyuhov@gmail.com">yevhen.yevsyuhov@gmail.com</a></small>
+						</div>
+					</div>
+				</section>
+				<section>
+					<p>But first...</p>
+					<h2 class="fragment">React.js</h2>
+				</section>
+				<section>
+					<div>
+						<p><span>Goal: </span><span class="fragment">SPA</span></p>
+						<p class="fragment"><span>Problem: </span><span class="fragment">Handling state</span></p>
+						<p class="fragment"><span>Solution: </span><span class="fragment">Components+One-direction data flow</span></p>
+					</div>
+				</section>
+				<section>
+					<h1>Components</h1>
+				</section>
+				<section>
+					<h2>Create a calendar widget</h2>
+					<section>
+						<h3>The way we do it</h3>
+						<div>
+<pre>
+<code data-trim data-noescape>
+&lt;!-- html --&gt;
+&lt;input id="datepicker"&gt;
+</code>
+</pre>
+<pre>
+<code>
+// javascript
+$('#datepicker').datepicker()
+</code>
+</pre>
+						</div>
+					</section>
+					<section>
+						<h3>The way we want to do it</h3>
+						<div>
+							<pre>
+<code data-trim data-noescape>
+&lt;script src="calendar-widget"&gt;
+&lt;calendar-widget/&gt;
+</code>
+							</pre>
+						</div>
+					</section>
+				</section>
+				<section>
+					<h2>Available solutions</h2>
+					<ul>
+						<li>
+							<a href="http://webcomponents.org/">WebComponents</a>
+							+
+							<a href="https://www.polymer-project.org/1.0/">Polymer</a>
+						</li>
+						<li><a href="https://angular.io/">Angular 2</a></li>
+						<li><a href="http://emberjs.com/">Ember</a></li>
+						<li><a href="http://aurelia.io/">Aurelia</a></li>
+						<li><a href="https://facebook.github.io/react/">React</a></li>
+					</ul>
+				</section>
+				<section>
+					<h2>React</h2>
+					<ul>
+						<li class="fragment">lightweight</li>
+						<li class="fragment">fast</li>
+						<li class="fragment">extendable</li>
+					</ul>
+				</section>
+				<section>
+					<h2>React crash-course</h2>
+					<section>
+						<ul>
+							<li class="fragment">Properties</li>
+							<li class="fragment" style="text-decoration: line-through">State</li>
+						</ul>
+					</section>
+					<section>
+						<pre>
+<code>
+const NameComponent = ({name, children}) => {
+  return (
+    &lt;div&gt;
+  	  &lt;p&gt;My name is {name}&lt;/p&gt;
+	  {children.map(child =&gt; &lt;Child person={child}/&gt;)}
+    &lt;/div&gt;
+  )
+}	
+</code>							
+						</pre>
+					</section>
+				</section>
+				<section>
+					<h2>Redux</h2>
+					<ul>
+						<li>Actions</li>
+						<li>Reducers</li>
+						<li>Store</li>
+					</ul>
+				</section>
+				<section>
+					<h2>Actions</h2>
+					<section>
+						<p class="fragment">Reason?</p>
+						<p class="fragment">Way to handle event</p>
+						<ul>
+							<li class="fragment">User clicks/writes/does something</li>
+							<li class="fragment">Response from server fires</li>
+							<li class="fragment">Various timeouts fire</li>
+						</ul>
+					</section>
+					<section>
+						<h3>Simplest action</h3>
+						<pre><code>{
+	type: 'ACTION_IDENTIFIER'  // yeap, just a string
+}</code></pre>
+					</section>
+					<section>
+						<h3>Events usually have parameters</h3>
+						<pre><code>{
+	type: 'USER_SELECTED_OPTION',
+	option_id: 5
+}</code></pre>
+					</section>
+					<section>
+						<h5>Problem with parametrized events</h5>
+						<pre><code>fireEvent({type: 'ACTION_ID', some_param: 1})
+fireEvent({
+  type: 'OTHER_ACTION',
+  some_other_param1: 1,
+  some_other_param2: 2
+})
+// hard to remember</code></pre>
+					</section>
+					<section>
+						<h5>Action creators</h5>
+						<pre><code>export function myAction(arg1, arg2) {
+  return {
+	type: 'MY_ACTION',
+	arg1,
+	arg2
+  }							
+}</code></pre>
+						<pre><code>import {myAction} from './actions'
+
+fireEvent(myAction(arg1, arg2))
+// better?</code></pre>
+					</section>
+				</section>
+				<section>
+					<h2>Reducers</h2>
+					<section>
+						<h3>Event fired. Now what?</h3>
+					</section>
+					<section>
+						<p>Our application has some state</p>
+						<pre class="fragment"><code>// as example
+let state = {
+  people: [{
+    id: 1
+    name: 'Andriy',
+    isGood: true
+  }, {
+    id: 2,
+    name: 'Sergiy',
+    isGood: true
+  }, {
+    id: 3,
+    name: 'Max',
+    isGood: false
+  }]
+}</code></pre>						
+					</section>
+					<section>
+						<p>Functions to handle actions</p>
+						<pre class="fragment"><code>// [] - default state
+export function reducer(state=[], action) {
+  switch (action.type) {
+
+    case 'PUSH_NUMBER':
+      // DO NOT MUTATE STATE IN REDUCERS!!!
+      return [...state, action.number]
+
+    default:
+      return state
+  }
+}</code></pre>
+					<h3 class="fragment">DO NOT MUTATE STATE IN REDUCER. IT IS INVARIANT.</h3>
+					</section>
+					<section>
+						<p>Will one function handle all our actions?</p>
+						<div>
+							<pre class="fragment"><code>let state = {
+  people: [...],
+  projects: [...]					
+}</code></pre>
+							<pre class="fragment"><code data-trim>const rootReducer = combineReducers({
+  people: peopleReducer,
+  projects: projectsReducer
+})</code></pre>
+							<pre class="fragment"><code data-trim>// receives state.people
+function peopleReducer(state=[], action) {...}
+
+// receives state.projects
+function projectReducer(state=[], action) {...}</code></pre>
+							<p class="fragment">Tip: design your state flat</p>
+						</div>
+					</section>
+				</section>
+				<section>
+					<h2>Store</h2>
+					<section>
+					<p class="fragment">Responsibilities:</p>
+					<ul>
+						<li class="fragment">Hold application state</li>
+						<li class="fragment">Dispatch actions</li>
+					</ul>
+					</section>
+					<section>
+						<pre class="fragment"><code data-trim>// already implemented
+import { createStore } from 'redux'
+
+import { rootReducer } from './reducers'
+import { myAction } from './actions'
+
+const defaultState = {...}
+
+const store = createStore(rootReducer, defaultState)
+
+store.dispatch(myAction())
+
+//store.dispatch({type: 'MY_ACTION'})
+//rootReducer(store.state, {type: 'MY_ACTION'})</code></pre>
+					</section>
+					<section>
+						<p>We can subscribe to state change</p>
+						<pre class="fragment"><code data-trim>function listener() {
+  let state = store.getState()
+  renderOurApplication(state)
+}
+
+store.subscribe(listener)</code></pre>
+					</section>
+				</section>
+				<section>
+					<h2>Tying it all together</h2>
+					<p class="fragment">Some events happen in the system</p>
+					<p class="fragment">We generate actions and dispatch them with store</p>
+					<p class="fragment">Store receives an action and sends it to reducer</p>
+					<p class="fragment">Reducer returns new state to store</p>
+					<p class="fragment">Store updates state and calls listeners</p>
+				</section>
+				<section>
+					<p><span>Let's create our own redux...</span> <span class="fragment">IN PYTHON!</span></p>
+				</section>
+				<section>
+					<section>
+						<p>Wait, what about react?</p>
+					</section>
+					<section>
+						<h1><a href="https://github.com/reactjs/react-redux">react-redux</a></h1>
+						<p>Tiny library to tie react to redux</p>
+					</section>
+					<section>
+						<pre class="fragment"><code>const MyComponent = ({name, onClick}) => {
+  return (
+    &lt;div&gt;
+      &lt;p&gt;My name is {name}&lt;/p&gt;
+      &lt;button onClick={onClick}&gt;Click me&lt;/button&gt;
+    &lt;/div&gt;
+  )							
+}</code></pre>
+						<pre class="fragment"><code>function mapStateToProps(state) {
+  return {
+    name: state.name
+  }
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onClick: () => dispatch(buttonClickAction())
+  }
+}
+
+//all magic is here
+export connect(mapStateToProps, mapDispatchToProps)(MyComponent)</code></pre>
+					</section>
+				</section>
+				<section>
+					<h1>Thanks!</h1>
+					<h2>Q&amp;A</h2>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			Reveal.initialize({
+				history: true,
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
